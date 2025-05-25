@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation"; // Importa useSearchParams
+import { useRouter, useSearchParams } from "next/navigation"; // Ima useSearchParam
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Link from "next/link";
 
 export default function ResetPasswordPage() {
-  const searchParams = useSearchParams(); // Inicializa useSearchParams
+  const searchParams = useSearchParams(); // 
   const token = searchParams.get("token"); // Captura el token de la URL
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -28,7 +28,7 @@ export default function ResetPasswordPage() {
           "Content-Type": "application/json",
         },
         
-        body: JSON.stringify({ token, newPassword: password, confirmPassword }), // Se envía el token también
+        body: JSON.stringify({ token, newPassword: password, confirmPassword }), // Se enva el token 
       });
 
       const data = await res.json();
@@ -38,7 +38,7 @@ export default function ResetPasswordPage() {
       }
 
       toast.success("Contraseña actualizada correctamente!");
-      router.push("/confirmation"); // Redirigir a la pantalla de bienvenida
+      router.push("/confirmation"); // Redirig a la pantalla de bienvenida
 
     } catch (error: unknown) {
       toast.error(error instanceof Error ? error.message : "Error inesperado.");
@@ -50,7 +50,7 @@ export default function ResetPasswordPage() {
       {/* Header */}
       <header className="bg-purple-700 py-9"></header>
 
-      {/* Título fuera del header */}
+      {/* Tulo fuera del header */}
       <div className="max-w-5xl mx-auto flex justify-start pl-2 mt-6">
         <h1 className="font-black text-3xl text-black">CineClic</h1>
       </div>
@@ -90,7 +90,7 @@ export default function ResetPasswordPage() {
             </button>
           </form>
 
-          {/* Hipervínculo para regresar al login */}
+          {/* Hipervculo para regresar al login */}
           <nav className="mt-6 text-sm text-center">
             <Link href="/login" className="text-purple-700 hover:underline">
               Volver al inicio de sesión

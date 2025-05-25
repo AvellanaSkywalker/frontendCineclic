@@ -25,7 +25,7 @@ import "react-toastify/dist/ReactToastify.css";
         if (!data.token) throw new Error("Login fallido");
 
         localStorage.setItem("token", data.token); //  Guarda el token
-        localStorage.setItem("userName", data.user.name); // ✅ Guarda el nombre
+        localStorage.setItem("userName", data.user.name); //  Guarda el nombre
         console.log("nombre guardado:", localStorage.getItem("userName"));
         
         toast.success("Inicio de sesión exitoso ");
@@ -44,7 +44,7 @@ import "react-toastify/dist/ReactToastify.css";
       {/* Header */}
       <header className="bg-purple-700 py-9"></header>
 
-      {/* Título fuera del header */}
+      {/* Ttulo fuera del header */}
       <div className="max-w-5xl mx-auto flex justify-start pl-2 mt-6">
         <h1 className="font-black text-3xl text-black">CineClic</h1>
       </div>
@@ -88,7 +88,7 @@ import "react-toastify/dist/ReactToastify.css";
             </button>
           </form>
 
-          {/* Hipervínculos */}
+          {/* Hipervnculos */}
           <nav className="mt-6 flex flex-col space-y-5 text-sm text-center">
             <Link href="/register" className="text-purple-700 hover:underline">
               ¿No tienes cuenta? Regístrate aquí

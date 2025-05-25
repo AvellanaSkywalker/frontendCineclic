@@ -5,18 +5,18 @@ import { useRouter, useSearchParams } from "next/navigation";
 
 export default function AuthPage() {
   const searchParams = useSearchParams();
-  const token = searchParams.get("token"); // Captura el token de la URL
+  const token = searchParams.get("token"); // tura el token de la URL
   const router = useRouter();
   const [validating, setValidating] = useState(true);
 
   useEffect(() => {
     
     if (!token) {
-      router.push("/"); // Si no hay token, redirige a la página principal
+      router.push("/"); // Si no hay token redirige a la pgina principal
       return;
     }
 
-    // Validar el token con el backend
+    // Validael token con el backend
     const validateToken = async () => {
       try {
         const res = await fetch(`http://localhost:4000/api/auth/confirm/${token}`);
@@ -29,12 +29,12 @@ export default function AuthPage() {
         setValidating(false);
 
         setTimeout(() => {
-            router.push("/login"); // Redirige al reset-password con el token
+            router.push("/login"); // Redirige al resetpassword con el token
         }, 5000);
-        // Redirige al reset-password con el token
+        // Redirige al resetpassword con el token
       } catch (error) {
         console.error(error);
-        router.push("/"); // Si falla, redirige al inicio
+        router.push("/"); // Si falla redirige al inicio
       }
     };
 

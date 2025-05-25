@@ -31,7 +31,7 @@ export default function RegisterPage() {
       }
 
       toast.success("Cuenta creada correctamente!");
-      router.push("/login"); // Redirigir al login
+      router.push("/login"); // Redirig al login
 
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -47,7 +47,7 @@ export default function RegisterPage() {
       {/* Header */}
       <header className="bg-purple-700 py-9"></header>
 
-      {/* Título fuera del header */}
+      {/* Ttulo fuera del header */}
       <div className="max-w-5xl mx-auto flex justify-start pl-2 mt-6">
         <h1 className="font-black text-3xl text-black">CineClic</h1>
       </div>
@@ -98,7 +98,7 @@ export default function RegisterPage() {
             </button>
           </form>
 
-          {/* Hipervínculo para iniciar sesión */}
+          {/* Hipervculo para iniciar sesión */}
           <nav className="mt-6 flex flex-col space-y-5 text-sm text-center">
             <Link href="/login" className="text-purple-700 hover:underline">
               ¿Ya tienes cuenta? Inicia sesión aquí

@@ -29,7 +29,7 @@ export default function ForgotPasswordPage() {
       }
 
       toast.success("Correo de recuperación enviado!");
-      router.push("/login"); // Redirigir al login después de enviar la solicitud
+      router.push("/login"); // Redirig al login desp de enviar la solicitud
 
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -45,7 +45,7 @@ export default function ForgotPasswordPage() {
       {/* Header */}
       <header className="bg-purple-700 py-9"></header>
 
-      {/* Título fuera del header */}
+      {/* Ttulo fuera del header */}
       <div className="max-w-5xl mx-auto flex justify-start pl-2 mt-6">
         <h1 className="font-black text-3xl text-black">CineClic</h1>
       </div>
@@ -60,7 +60,7 @@ export default function ForgotPasswordPage() {
 
       </div>
 
-      {/* Formulario de recuperación */}
+      {/* Formulario de recuperaci */}
       <main className="flex-grow flex items-center justify-center">
         <div className="p-8 rounded-lg w-full max-w-md text-left">
           <form className="space-y-6" onSubmit={handleResetPassword}>
@@ -80,7 +80,7 @@ export default function ForgotPasswordPage() {
             </button>
           </form>
 
-          {/* Hipervínculo para regresar al login */}
+          {/* Hipervculo para regresar al login */}
           <nav className="mt-6 text-sm text-center">
             <Link href="/login" className="text-purple-700 hover:underline">
               Volver al inicio de sesión

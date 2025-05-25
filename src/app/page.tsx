@@ -2,20 +2,20 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation"; // Importar para la redirección
+import { useRouter } from "next/navigation"; // Importa para la redirecci
 import "./globals.css";
 
 export default function Home() {
   const [movies, setMovies] = useState<{ id: number; title: string; poster: string }[]>([]);
   const [token, setToken] = useState<string | null>(null);
-  const [userName, setUserName] = useState<string>("Invitado"); // Estado para el nombre del usuario
-  const [menuOpen, setMenuOpen] = useState(false); // Controlar la visibilidad del menú
+  const [userName, setUserName] = useState<string>("Invitado"); // Etado para el nombre del usuario
+  const [menuOpen, setMenuOpen] = useState(false); // Controla la visibilidad del men
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
     const savedToken = localStorage.getItem("token");
-    const savedName = localStorage.getItem("userName"); // ✅ Obtiene el nombre
+    const savedName = localStorage.getItem("userName"); // Obtiene el nombr
 
     console.log("nombre em home:", savedName)
 
@@ -28,13 +28,13 @@ export default function Home() {
     setToken(savedToken);
     
     if (savedName) {
-      setUserName(savedName); // ✅ Asigna el nombre al botón
+      setUserName(savedName); // Asigna el nombre al bot
     } else {
       setUserName("Usuario");
     }
   }, []);
 
-  // Cargar películas
+  // Cargar pelul
   useEffect(() => {
     if (!token) return;
 
@@ -53,7 +53,7 @@ export default function Home() {
       .finally(() => setLoading(false));
   }, [token]);
 
-  // Función para cerrar sesión
+  // Funci para cerrar sesi
   const handleLogout = () => {
     localStorage.removeItem("token"); // Borra el token
     router.push("/login"); // Redirige al login
@@ -69,12 +69,12 @@ export default function Home() {
       </header>
 
         <div className="w-full flex justify-between px-10 mt-6">
-          {/* Botón de Consulta (Izquierda) */}
+          {/* Bot de Consulta Izquierda */}
           <button className="bg-pink-500 text-white px-6 py-3 rounded-full text-sm">
             Consulta
           </button>
 
-          {/* Botón de Usuario con menú desplegable (Derecha) */}
+          {/* Bot de Usuario con men desplegable Derecha */}
           <div className="relative">
             <button
               onClick={() => setMenuOpen(!menuOpen)}
