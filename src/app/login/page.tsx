@@ -26,11 +26,23 @@ import "react-toastify/dist/ReactToastify.css";
 
         localStorage.setItem("token", data.token); //  Guarda el token
         localStorage.setItem("userName", data.user.name); //  Guarda el nombre
+        localStorage.setItem("userRole", data.user.role);
+        console.log("Rol guardado:", localStorage.getItem("userRole"));
+
+
+        toast.success("inicio de sesión exitoso");
+        
+        if(data.user.role === "admin"){
+            console.log("dirige a admin");
+            router.push("/admin"); // Redirige al panel de administrador
+        }else{
+            router.push("/"); // Redirige al home
+        }
+    
         console.log("nombre guardado:", localStorage.getItem("userName"));
         
         toast.success("Inicio de sesión exitoso ");
         
-        router.push("/"); // Redirige al home
     } catch (error) {
         console.error(error);
         const errorMessage = error instanceof Error ? error.message : "Error inesperado";

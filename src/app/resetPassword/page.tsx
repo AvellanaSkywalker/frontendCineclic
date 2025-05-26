@@ -5,8 +5,17 @@ import { useRouter, useSearchParams } from "next/navigation"; // Ima useSearchPa
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Link from "next/link";
+import { Suspense } from "react";
 
 export default function ResetPasswordPage() {
+  return(
+    <Suspense fallback={<div>Cargando...</div>}>
+      <ResetPasswordForm />
+    </Suspense>
+  );
+}
+
+function ResetPasswordForm() {
   const searchParams = useSearchParams(); // 
   const token = searchParams.get("token"); // Captura el token de la URL
   const [password, setPassword] = useState("");

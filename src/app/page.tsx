@@ -16,6 +16,7 @@ export default function Home() {
   useEffect(() => {
     const savedToken = localStorage.getItem("token");
     const savedName = localStorage.getItem("userName"); // Obtiene el nombr
+    const savedRole = localStorage.getItem("userRole"); // Obtiene el rol del usuario
 
     console.log("nombre em home:", savedName)
 
@@ -26,13 +27,17 @@ export default function Home() {
     }
 
     setToken(savedToken);
+
+    if(savedRole === "admin" && location.pathname !== "/admin"){
+      router.push("/admin"); // Redirige al home si no es admin
+    }
     
     if (savedName) {
       setUserName(savedName); // Asigna el nombre al bot
     } else {
       setUserName("Usuario");
     }
-  }, []);
+  }, [router]);
 
   // Cargar pelul
   useEffect(() => {
