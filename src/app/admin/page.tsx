@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { withAuth } from "../withAuth";
 
 type Movie = {
   id: string;
@@ -224,8 +225,8 @@ export default function AdminPage() {
         movieId: selectedMovie.id,
         roomId: roomId,
         date,
-        startTime: time,  // Hora de inicio (ej: "14:30")
-        endTime: endTime,  // Hora de fin calculada (ej: "16:30")
+        startTime: time,  // Hora de inicio ej: "14:30
+        endTime: endTime,  // Hora de fin calculada ej: "16:30"
         price: Number(price),
       }),
     });
@@ -324,7 +325,7 @@ export default function AdminPage() {
           )}
         </div>
 
-        {/* Sección derecha - Formularios */}
+        {/* Seccin derecha - Formularios */}
         <div className="w-2/3 bg-white p-4 rounded-lg shadow-md">
           {activeTab === "movies" && (
             <>
@@ -483,3 +484,5 @@ export default function AdminPage() {
     </div>
   );
 }
+
+export const AdminPageWithAuth = withAuth(AdminPage, { allowedRoles: ["admin"] });
