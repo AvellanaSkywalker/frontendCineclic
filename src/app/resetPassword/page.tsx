@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation"; // Ima useSearchParam
+import { useRouter, useSearchParams } from "next/navigation"; //  useSearchParam
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Link from "next/link";
@@ -17,7 +17,7 @@ export default function ResetPasswordPage() {
 
 function ResetPasswordForm() {
   const searchParams = useSearchParams(); // 
-  const token = searchParams.get("token"); // Captura el token de la URL
+  const token = searchParams.get("token"); // captura el token de la url
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const router = useRouter();
@@ -37,7 +37,7 @@ function ResetPasswordForm() {
           "Content-Type": "application/json",
         },
         
-        body: JSON.stringify({ token, newPassword: password, confirmPassword }), // Se enva el token 
+        body: JSON.stringify({ token, newPassword: password, confirmPassword }), // se enva el token 
       });
 
       const data = await res.json();
@@ -47,7 +47,7 @@ function ResetPasswordForm() {
       }
 
       toast.success("Contraseña actualizada correctamente!");
-      router.push("/confirmation"); // Redirig a la pantalla de bienvenida
+      router.push("/confirmation"); // dirige a la pantalla de bienvenida
 
     } catch (error: unknown) {
       toast.error(error instanceof Error ? error.message : "Error inesperado.");
@@ -59,7 +59,7 @@ function ResetPasswordForm() {
       {/* Header */}
       <header className="bg-purple-700 py-9"></header>
 
-      {/* Tulo fuera del header */}
+      {/* Tutlo fuera del header */}
       <div className="max-w-5xl mx-auto flex justify-start pl-2 mt-6">
         <h1 className="font-black text-3xl text-black">CineClic</h1>
       </div>
@@ -68,7 +68,7 @@ function ResetPasswordForm() {
         <h2 className="text-4xl font-bold text-gray-900">Restablecer Contraseña</h2>
       </div>
 
-      {/* Formulario de restablecimiento */}
+      {/* formulario de restablecimiento */}
       <main className="flex-grow flex items-center justify-center">
         <div className="p-8 rounded-lg w-full max-w-md text-left">
           <form className="space-y-6" onSubmit={handleResetPassword}>
@@ -99,7 +99,7 @@ function ResetPasswordForm() {
             </button>
           </form>
 
-          {/* Hipervculo para regresar al login */}
+          {/* hpervinculo para regresar al login */}
           <nav className="mt-6 text-sm text-center">
             <Link href="/login" className="text-purple-700 hover:underline">
               Volver al inicio de sesión

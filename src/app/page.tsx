@@ -5,8 +5,8 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import "./globals.css";
 
-// Función para validar URLs de Cloudinary
-// const validatePosterUrl = (url: string | undefined): string => {
+// Funcion para validar URL de cloudinary
+// const validatePosterUrl = url: string | undefined: string => {
 //   if (!url) return '';
   
 //   // Asegurar que la URL sea válida
@@ -53,7 +53,7 @@ export default function Home() {
     setUserName(savedName || "Usuario");
   }, [router]);
 
-  // Cargar películas
+  // cargar peiculas
   useEffect(() => {
     if (!token) return;
 
@@ -150,7 +150,7 @@ export default function Home() {
                     unoptimized={false}
                     onError={(e) => {
                       console.error("Error cargando la imagen:", movie.poster);
-                      // No establecemos src alternativo para mantener limpio el diseño
+                      
                       e.currentTarget.src = "data:image/svg+xml;base64,...";
                     }}
                   />
@@ -178,7 +178,7 @@ export default function Home() {
   );
 }
 
-// Define a type for the movie object
+// define a typepara movie object
 type MovieApiResponse = {
   id: string;
   title: string;

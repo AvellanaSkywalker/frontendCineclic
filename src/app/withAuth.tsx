@@ -2,14 +2,14 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-; // Opcional: componente de carga
+
 
 /**
  * Higher-Order Component para proteger rutas
- * @param WrappedComponent - Componente a proteger
- * @param allowedRoles - Roles permitidos (opcional)
- * @param redirectUnauthenticated - Ruta para redirigir si no está autenticado (default: '/login')
- * @param redirectUnauthorized - Ruta para redirigir si no tiene permisos (default: '/')
+ * @param WrappedComponent - componente a proteger
+ * @param allowedRoles - roles permitidos 
+ * @param redirectUnauthenticated - ruta para redirigir si no esta autenticado default: /login
+ * @param redirectUnauthorized - ruta para redirigir si no tiene permisos default: '/'
  */
 export const withAuth = (
   WrappedComponent: React.ComponentType,
@@ -36,13 +36,13 @@ export const withAuth = (
       const token = localStorage.getItem('token');
       const role = localStorage.getItem('userRole');
 
-      // Si no hay token, redirige a login
+      // si no hay token redirige a login
       if (!token) {
         router.push(defaultOptions.redirectUnauthenticated);
         return;
       }
 
-      // Si la ruta requiere roles específicos y el usuario no tiene permiso
+      // si la ruta requiere roles especificos y el usuario no tiene permiso
       if (
         defaultOptions.allowedRoles.length > 0 &&
         !defaultOptions.allowedRoles.includes(role || '')
@@ -51,7 +51,7 @@ export const withAuth = (
         return;
       }
 
-      // Si pasa todas las validaciones
+      // si pasa todas las validaciones
       setIsAuthorized(true);
     }, [router]);
 

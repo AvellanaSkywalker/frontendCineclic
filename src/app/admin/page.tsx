@@ -49,11 +49,11 @@ export default function AdminPage() {
   const [activeTab, setActiveTab] = useState("movies");
   const [price, setPrice] = useState("");
 
-  // Generar fechas para los próximos 7 días
+  // genera fechas para los procimos 7 días
   const getWeekDates = () => {
     const dates = [];
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Normalizar la fecha
+    today.setHours(0, 0, 0, 0); // normaliza la fecha
     
     for (let i = 0; i < 6; i++) {
       const date = new Date(today);
@@ -72,14 +72,14 @@ export default function AdminPage() {
 
   const fetchData = async () => {
     try {
-      // Obtener películas
+      // obtiene pelics
       const moviesRes = await fetch("http://localhost:4000/api/movies", {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       const moviesData = await moviesRes.json();
       setMovies(moviesData.movies || []);
 
-      // Obtener salas
+      // obtiene salas
       const roomsRes = await fetch("http://localhost:4000/api/rooms", {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
@@ -99,7 +99,7 @@ export default function AdminPage() {
 
   useEffect(() => { fetchData(); }, []);
 
-  // Manejar selección/edición de película
+  // maneja seleccion/edicion de movie
   const handleSelectMovie = (movie: Movie) => {
     setSelectedMovie(movie);
     setTitle(movie.title);
@@ -109,7 +109,7 @@ export default function AdminPage() {
     setIsEditing(true);
   };
 
-  // Habilitar modo creación nueva película
+  // habilita modo crear nueva peli
   const handleSaveMovie = async () => {
   if(!isEditing) return;
 
@@ -156,14 +156,14 @@ export default function AdminPage() {
   const resetForm = () => {
   setSelectedMovie(null);
   setTitle("");
-  setDescription(""); // Cambiado a synopsis si es el caso
+  setDescription(""); // 
   setDuration("");
   setImage(null);
   setImagePreview(null);
   setIsEditing(true);
 };
 
-  // Manejar subida de imagen
+  // maneja subida de imagen
   const handleImagePreview = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if(file){
@@ -177,7 +177,7 @@ export default function AdminPage() {
 
 
 
-  // Eliminar película
+  // elimina peli
   const handleDeleteMovie = async () => {
     if (!selectedMovie) return;
     
@@ -197,7 +197,7 @@ export default function AdminPage() {
     }
   };
 
-  // Crear nueva función
+  // crea nueva screening
  const handleCreateScreening = async () => {
   try {
     if (!selectedMovie) {
@@ -205,15 +205,15 @@ export default function AdminPage() {
       return;
     }
 
-    // Calcula endTime (startTime + duración de la película)
+    // calcula endTime startTime + duracion de la peli
     const [hours, minutes] = time.split(":").map(Number);
     const startDateTime = new Date();
     startDateTime.setHours(hours, minutes, 0, 0);
 
-    const movieDuration = Number(selectedMovie.duration) || 120; // 120 mins (2h) por defecto
-    const endDateTime = new Date(startDateTime.getTime() + movieDuration * 60000); // +duració en milisegundos
+    const movieDuration = Number(selectedMovie.duration) || 120; // 
+    const endDateTime = new Date(startDateTime.getTime() + movieDuration * 60000); // 
 
-    const endTime = endDateTime.toTimeString().slice(0, 5); // Formato "HH:MM"
+    const endTime = endDateTime.toTimeString().slice(0, 5); // formato HH:MM
 
     const res = await fetch("http://localhost:4000/api/screening", {
       method: "POST",
@@ -225,8 +225,8 @@ export default function AdminPage() {
         movieId: selectedMovie.id,
         roomId: roomId,
         date,
-        startTime: time,  // Hora de inicio ej: "14:30
-        endTime: endTime,  // Hora de fin calculada ej: "16:30"
+        startTime: time,  // hora de inicio 
+        endTime: endTime,  // hora de fin calculada 
         price: Number(price),
       }),
     });
@@ -325,7 +325,7 @@ export default function AdminPage() {
           )}
         </div>
 
-        {/* Seccin derecha - Formularios */}
+        {/* seccion derecha - formularios */}
         <div className="w-2/3 bg-white p-4 rounded-lg shadow-md">
           {activeTab === "movies" && (
             <>

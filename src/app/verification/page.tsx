@@ -23,11 +23,11 @@ function AuthContent() {
   useEffect(() => {
     
     if (!token) {
-      router.push("/"); // Si no hay token redirige a la pgina principal
+      router.push("/"); // si no hay token redirige a la pgina principal
       return;
     }
 
-    // Validael token con el backend
+    // validael token con el backend
     const validateToken = async () => {
       try {
         const res = await fetch(`http://localhost:4000/api/auth/confirm/${token}`);
@@ -40,12 +40,12 @@ function AuthContent() {
         setValidating(false);
 
         setTimeout(() => {
-            router.push("/login"); // Redirige al resetpassword con el token
+            router.push("/login"); // redirige al resetpassword con el token
         }, 5000);
-        // Redirige al resetpassword con el token
+        // redirige al resetpassword con el token
       } catch (error) {
         console.error(error);
-        router.push("/"); // Si falla redirige al inicio
+        router.push("/"); // si falla redirige al inicio
       }
     };
 
