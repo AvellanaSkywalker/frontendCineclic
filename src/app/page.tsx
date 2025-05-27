@@ -5,19 +5,6 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import "./globals.css";
 
-// Funcion para validar URL de cloudinary
-// const validatePosterUrl = url: string | undefined: string => {
-//   if (!url) return '';
-  
-//   // Asegurar que la URL sea válida
-//   try {
-//     new URL(url);
-//     return url;
-//   } catch {
-//     return '';
-//   }
-// };
-
 export default function Home() {
   const [movies, setMovies] = useState<{ id: number; title: string; poster: string }[]>([]);
   const [token, setToken] = useState<string | null>(null);
@@ -137,6 +124,7 @@ export default function Home() {
             movies.map((movie) => (
               <button
                 key={movie.id}
+                onClick={() => router.push(`/movieDetail/${movie.id}`)}
                 className="bg-gray-800 text-white p-4 rounded-lg flex items-center gap-5 text-md w-full hover:bg-gray-500 transition-colors"
               >
                 {movie.poster ? (
