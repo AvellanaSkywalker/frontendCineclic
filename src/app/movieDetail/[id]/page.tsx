@@ -262,8 +262,7 @@ export default function MovieDetail() {
                               key={i}
                               onClick={() =>
                                 router.push(
-                                  `/booking?time=${encodeURIComponent(formattedTime)}&date=${screening.startTime.split('T')[0]}&movieId=${id}`
-                                )
+                                  `/seat-selection`)
                               }
                               className="w-full bg-purple-100 hover:bg-purple-200 text-purple-800 py-1 px-2 rounded text-sm transition"
                             >
