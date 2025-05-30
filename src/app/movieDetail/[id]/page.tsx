@@ -123,7 +123,7 @@ export default function MovieDetail() {
   // filtra screenings por dia usando el startTime
   const getScreeningsForDay = (isoDate: string) => {
     const filtered = screenings.filter(screening => {
-      // Extraer la parte de fecha de startTime.
+      // Extrae la parte de fecha de startTime
       const screeningDate = screening.startTime.split('T')[0];
       console.log("Comparando:", screeningDate, "con", isoDate);
       return screeningDate === isoDate;
@@ -262,7 +262,8 @@ export default function MovieDetail() {
                               key={i}
                               onClick={() =>
                                 router.push(
-                                  `/seat-selection`)
+                                  `/seat-selection?screeningId=${screening.id}&roomId=${screening.roomId}&movieName=${encodeURIComponent(movie.title)}&schedule=${screening.startTime}&imageUrl=${encodeURIComponent(movie.posterurl)}&price=${screening.price}`
+                                )
                               }
                               className="w-full bg-purple-100 hover:bg-purple-200 text-purple-800 py-1 px-2 rounded text-sm transition"
                             >

@@ -115,7 +115,7 @@ export default function AdminPage() {
 
   const formData = new FormData();
   formData.append('title', title);
-  formData.append('description', description); // Mapea a 'description' del backend
+  formData.append('description', description); // Mapea a description del backend
   formData.append('duration', duration);
   formData.append('rating', '5');
   
