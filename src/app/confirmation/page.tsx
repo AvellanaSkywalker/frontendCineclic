@@ -8,7 +8,7 @@ export default function WelcomePage() {
 
   useEffect(() => {
     setTimeout(() => {
-      router.push("/login"); // redirig a la pgna principal despues de unos segundos 5
+      router.push("/login"); // redirig a la pgna principal despues de 5 segundos 
     }, 5000);
   }, [router]);
 

@@ -8,10 +8,12 @@ import "react-toastify/dist/ReactToastify.css";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
+  const [emailError, setEmailError] = useState("");
   const router = useRouter();
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
+    setEmailError("");
 
     try {
       const res = await fetch("http://localhost:4000/api/auth/forgotPassword", {
@@ -25,12 +27,16 @@ export default function ForgotPasswordPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.message || "Error en la solicitud");
+        
+        if (res.status === 404 ) {
+          setEmailError("Este email no está registrado. Intente de nuevo");
+          return; 
+        }
+        throw new Error(data.error || `Error ${res.status}`);
       }
 
       toast.success("Correo de recuperación enviado!");
-      router.push("/login"); // redirige al login despue de enviar la solicitud
-
+      router.push("/login"); 
     } catch (error: unknown) {
       if (error instanceof Error) {
         toast.error(error.message || "Error al solicitar recuperación");
@@ -42,10 +48,10 @@ export default function ForgotPasswordPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-white text-gray-900">
-      {/* Header */}
+      {/* header */}
       <header className="bg-purple-700 py-9"></header>
 
-      {/* titulo fuera del header */}
+ 
       <div className="max-w-5xl mx-auto flex justify-start pl-2 mt-6">
         <h1 className="font-black text-3xl text-black">CineClic</h1>
       </div>
@@ -53,14 +59,12 @@ export default function ForgotPasswordPage() {
       <div className="max-w-5xl mx-auto mt-20 pl-2">
         <h2 className="text-4xl font-bold text-gray-900">Recuperar Contraseña</h2>
         <p className="text-left text-gray-600 mt-2 max-w-md">
-            Ingresa tu correo electrónico y te enviaremos un enlace para que 
-            puedas restablecer tu contraseña de forma segura. Si no recibes el 
-            correo en unos minutos, revisa tu bandeja de spam o intenta nuevamente.
+          Ingresa tu correo electrónico y te enviaremos un enlace para que puedas restablecer tu contraseña de forma segura.
+          Si no recibes el correo en unos minutos, revisa tu bandeja de spam o intenta nuevamente.
         </p>
-
       </div>
 
-      {/* gormulario de recup */}
+      {/* formulario recuperacion */}
       <main className="flex-grow flex items-center justify-center">
         <div className="p-8 rounded-lg w-full max-w-md text-left">
           <form className="space-y-6" onSubmit={handleResetPassword}>
@@ -69,10 +73,15 @@ export default function ForgotPasswordPage() {
               <input
                 type="email"
                 placeholder="Ingresa tu correo"
-                className="w-full border-b border-gray-400 p-2 focus:outline-none"
+                className={`w-full border-b p-2 focus:outline-none ${
+                  emailError ? "border-red-500" : "border-gray-400"
+                }`}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
+              {emailError && (
+                <p className="text-red-500 text-xs italic">{emailError}</p>
+              )}
             </div>
 
             <button className="bg-purple-700 hover:bg-purple-600 w-full p-2 rounded-xl text-white font-bold text-lg">
@@ -90,9 +99,19 @@ export default function ForgotPasswordPage() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-6 mt-auto text-right text-sm">
-        <p>Soporte técnico: <span className="font-bold">soporte@cineclic.com</span></p>
-      </footer>
+        <footer className="bg-gray-900 text-white py-5">
+          <div className="max-w-5xl mx-auto text-right text-sm">
+            <p>
+              Soporte técnico:{" "}
+              <a 
+                href="mailto:soporte@cineclic.com" 
+                className="font-bold underline hover:text-pink-300 transition-colors"
+              >
+                cinceclic.official@gmail.com
+              </a>
+            </p>
+          </div>
+        </footer>
     </div>
   );
 }

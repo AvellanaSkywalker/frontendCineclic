@@ -16,14 +16,14 @@ export default function AuthPage() {
 
 function AuthContent() {
   const searchParams = useSearchParams();
-  const token = searchParams.get("token"); // tura el token de la URL
+  const token = searchParams.get("token"); 
   const router = useRouter();
   const [validating, setValidating] = useState(true);
 
   useEffect(() => {
     
     if (!token) {
-      router.push("/"); // si no hay token redirige a la pgina principal
+      router.push("/"); 
       return;
     }
 

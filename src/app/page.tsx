@@ -21,7 +21,7 @@ export default function Home() {
     if (!savedToken) {
       console.error("Error: No se encontró un token en localStorage.");
       router.push("/login");
-      //setLoading(false);
+      
       return;
     }
 
@@ -40,7 +40,7 @@ export default function Home() {
     setUserName(savedName || "Usuario");
   }, [router]);
 
-  // cargar peiculas
+  // carga peiculas
   useEffect(() => {
     if (!token) return;
 
@@ -81,21 +81,26 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen bg-white text-gray-900">
-      <header className="bg-purple-700 py-5">
+      {/* Header  */}
+      <header className="bg-purple-700 py-5 sticky top-0 z-10">
         <div className="max-w-5xl mx-auto">
           <h1 className="font-black text-3xl text-white pl-2">CineClic</h1>
         </div>
       </header>
 
-      <div className="w-full flex justify-between px-10 mt-6">
-        <button className="bg-pink-500 text-white px-6 py-3 rounded-full text-sm">
+      {/* Botones */}
+      <div className="w-full flex justify-between px-10 py-4 sticky top-16 bg-white z-10">
+        <button
+          onClick={() => router.push(`/bookings`)}
+          className="bg-pink-500 text-white px-6 py-3 rounded-full text-sm hover:bg-violet-400 transition-colors duration-200"
+        >
           Consulta
         </button>
 
         <div className="relative">
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className="bg-pink-500 text-white px-6 py-3 rounded-full text-sm flex items-center gap-2"
+            className="bg-pink-500 text-white px-6 py-3 rounded-full text-sm flex items-center gap-2 hover:bg-violet-400 transition-colors duration-200"
           >
             <span>{userName}</span>
             <svg className="w-5 h-5" fill="white" viewBox="0 0 20 20">
@@ -116,57 +121,59 @@ export default function Home() {
         </div>
       </div>
 
-      <main className="max-w-5xl mx-auto p-5 flex-grow">
-        <div className="flex flex-col gap-4 w-full max-w-md">
-          {loading ? (
-            <p className="text-center text-gray-500">Cargando películas...</p>
-          ) : (
-            movies.map((movie) => (
-              <button
-                key={movie.id}
-                onClick={() => router.push(`/movieDetail/${movie.id}`)}
-                className="bg-gray-800 text-white p-4 rounded-lg flex items-center gap-5 text-md w-full hover:bg-gray-500 transition-colors"
+      {/* Contenedor principal para pel */}
+      <div className="flex-grow overflow-y-auto pb-20">
+        <main className="max-w-5xl mx-auto p-5">
+          <div className="flex flex-col gap-4 w-full pl-2"> {/*  */}
+            {loading ? (
+              <p className="text-center text-gray-500">Cargando películas...</p>
+            ) : (
+              movies.map((movie) => (
+                <button
+                  key={movie.id}
+                  onClick={() => router.push(`/movieDetail/${movie.id}`)}
+                  className="bg-white text-gray-900 p-8 rounded-lg flex items-center gap-8 w-full hover:bg-pink-100 transition-colors"
+                >
+                  {movie.poster ? (
+                    <Image 
+                      src={movie.poster} 
+                      alt={movie.title} 
+                      width={128} 
+                      height={192}
+                      quality={80}
+                      className="object-cover rounded-md"
+                    />
+                  ) : (
+                    <div className="w-32 h-48 bg-gray-200 rounded-md flex items-center justify-center">
+                      <span className="text-xs text-gray-400">Sin imagen</span>
+                    </div>
+                  )}
+                  <h2 className="font-bold">{movie.title}</h2>
+                </button>
+              ))
+            )}
+          </div>
+        </main>
+      </div>
+      {/* Footer */}
+        <footer className="bg-gray-900 text-white py-5 sticky bottom-0 z-10">
+          <div className="max-w-5xl mx-auto text-right text-sm">
+            <p>
+              Soporte técnico:{" "}
+              <a 
+                href="mailto:soporte@cineclic.com" 
+                className="font-bold underline hover:text-pink-300 transition-colors"
               >
-                {movie.poster ? (
-                  <Image 
-                    src={movie.poster} 
-                    alt={movie.title} 
-                    width={64} 
-                    height={96}
-                    quality={80}
-                    className="object-cover rounded-md"
-                    unoptimized={false}
-                    onError={(e) => {
-                      console.error("Error cargando la imagen:", movie.poster);
-                      
-                      e.currentTarget.src = "data:image/svg+xml;base64,...";
-                    }}
-                  />
-                ) : (
-                  <div className="w-16 h-24 bg-gray-600 rounded-md flex items-center justify-center">
-                    <span className="text-xs text-gray-300">Sin imagen</span>
-                  </div>
-                )}
-                <h2 className="font-bold">{movie.title}</h2>
-              </button>
-            ))
-          )}
-        </div>
-      </main>
-
-      <footer className="bg-gray-900 text-white py-5 mt-auto">
-        <div className="max-w-5xl mx-auto text-right text-sm">
-          <p>
-            Soporte técnico contactarse a{" "}
-            <span className="font-bold">soporte@cineclic.com</span>
-          </p>
-        </div>
-      </footer>
+                cinceclic.official@gmail.com
+              </a>
+            </p>
+          </div>
+        </footer>
     </div>
   );
 }
 
-// define a typepara movie object
+
 type MovieApiResponse = {
   id: string;
   title: string;

@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "axios": "^1.9.0",
+    "eslint-plugin-react-hooks": "^6.1.0-canary-14094f80-20250529",
     "next": "^15.3.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

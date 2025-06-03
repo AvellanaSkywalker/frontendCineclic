@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation"; //  useSearchParam
+import { useRouter, useSearchParams } from "next/navigation"; 
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Link from "next/link";
@@ -17,7 +17,7 @@ export default function ResetPasswordPage() {
 
 function ResetPasswordForm() {
   const searchParams = useSearchParams(); // 
-  const token = searchParams.get("token"); // captura el token de la url
+  const token = searchParams.get("token"); 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const router = useRouter();
@@ -37,7 +37,7 @@ function ResetPasswordForm() {
           "Content-Type": "application/json",
         },
         
-        body: JSON.stringify({ token, newPassword: password, confirmPassword }), // se enva el token 
+        body: JSON.stringify({ token, newPassword: password, confirmPassword }), 
       });
 
       const data = await res.json();
@@ -59,7 +59,7 @@ function ResetPasswordForm() {
       {/* Header */}
       <header className="bg-purple-700 py-9"></header>
 
-      {/* Tutlo fuera del header */}
+      {/* Tutlo  */}
       <div className="max-w-5xl mx-auto flex justify-start pl-2 mt-6">
         <h1 className="font-black text-3xl text-black">CineClic</h1>
       </div>
@@ -109,9 +109,19 @@ function ResetPasswordForm() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-6 mt-auto text-right text-sm">
-        <p>Soporte técnico: <span className="font-bold">soporte@cineclic.com</span></p>
-      </footer>
+        <footer className="bg-gray-900 text-white py-5">
+          <div className="max-w-5xl mx-auto text-right text-sm">
+            <p>
+              Soporte técnico:{" "}
+              <a 
+                href="mailto:soporte@cineclic.com" 
+                className="font-bold underline hover:text-pink-300 transition-colors"
+              >
+                cinceclic.official@gmail.com
+              </a>
+            </p>
+          </div>
+        </footer>
     </div>
   );
 }
