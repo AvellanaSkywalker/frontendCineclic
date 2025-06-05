@@ -32,7 +32,7 @@ type Screening = {
 
 type WeekDate = { dateObj: Date; formattedDate: string; isoDate: string };
 
-// funciomn para generar layout predeterminado
+// genera layout predeterminado
 const generateDefaultLayout = () => {
   const rows = ["A", "B", "C", "D", "E", "F", "G"];
   const columns = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
@@ -52,7 +52,7 @@ const generateDefaultLayout = () => {
   };
 };
 
-export default function AdminPage() {
+function AdminPage() {
   const router = useRouter();
   const [movies, setMovies] = useState<Movie[]>([]);
   const [rooms, setRooms] = useState<Room[]>([]);
@@ -67,6 +67,7 @@ export default function AdminPage() {
   const [duration, setDuration] = useState("");
   const [globalPrice, setGlobalPrice] = useState("");
   const [screeningTimes, setScreeningTimes] = useState<Record<string, string>>({});
+  const [formActive, setFormActive] = useState(false);
 
   // genera fechas para los prox 7 dias
   const getWeekDates = () => {
@@ -89,13 +90,12 @@ export default function AdminPage() {
   const weekDates: WeekDate[] = getWeekDates();
 
   useEffect(() => {
-    const userRole = localStorage.getItem("userRole");
-    if (userRole !== "admin") router.push("/");
-  }, [router]);
+    fetchData(); 
+  }, []);
 
   const fetchData = async () => {
     try {
-      // obtiene peli
+      // obtiene peliculas
       const moviesRes = await fetch("http://localhost:4000/api/movies", {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
@@ -121,10 +121,6 @@ export default function AdminPage() {
     }
   };
 
-  useEffect(() => { 
-    fetchData(); 
-  }, []);
-
   const handleSelectMovie = (movie: Movie) => {
     setSelectedMovie(movie);
     setTitle(movie.title);
@@ -132,6 +128,7 @@ export default function AdminPage() {
     setDuration(movie.duration);
     setImagePreview(movie.poster ?? null);
     setIsEditing(true);
+    setFormActive(true);
   };
 
   const handleSaveMovie = async () => {
@@ -168,7 +165,7 @@ export default function AdminPage() {
       const data = await res.json();
       toast.success(selectedMovie ? 'Película actualizada' : 'Película creada');
       
-      // nueva pelicula selecciona automaticamente
+      
       if (!selectedMovie) {
         setSelectedMovie(data.movie);
       }
@@ -188,6 +185,7 @@ export default function AdminPage() {
     setImage(null);
     setImagePreview(null);
     setIsEditing(true);
+    setFormActive(false);
   };
 
   const handleImagePreview = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -287,7 +285,7 @@ export default function AdminPage() {
         }
       }
 
-      //crea funcn con sala seleccionada
+      // crea funcion con sala seleccionada
       const [hours, minutes] = time.split(":").map(Number);
       const startDateTime = new Date();
       startDateTime.setHours(hours, minutes, 0, 0);
@@ -326,12 +324,33 @@ export default function AdminPage() {
     }
   };
 
+  //  elimina una funcn programada
+  const handleDeleteScreening = async (screeningId: string) => {
+    try {
+      const res = await fetch(`http://localhost:4000/api/screening/${screeningId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
+
+      if (res.ok) {
+        toast.success("Función eliminada");
+        // actualiza el estado de screenings 
+        setScreenings(prev => prev.filter(s => s.id !== screeningId));
+      } else {
+        const error = await res.json();
+        throw new Error(error.error || "Error al eliminar función");
+      }
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Error desconocido");
+    }
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-gray-100 text-gray-900">
       <header className="bg-purple-700 py-4 flex justify-between items-center px-6">
         <h1 className="text-2xl font-bold text-white">CineClic Admin</h1>
         <div className="relative">
-          <button onClick={() => setMenuOpen(!menuOpen)} className="bg-pink-500 text-white px-4 py-2 rounded-full">
+          <button onClick={() => setMenuOpen(!menuOpen)} className="bg-pink-500 text-white px-4 py-2 rounded-full hover:bg-violet-400 transition-colors">
             Administrador
           </button>
           {menuOpen && (
@@ -370,17 +389,17 @@ export default function AdminPage() {
                 )}
               </div>
               <button 
-                onClick={() => { resetForm(); setIsEditing(true); }}
+                onClick={() => { resetForm(); setIsEditing(true); setFormActive(true); }}
                 className="bg-green-500 text-white px-3 py-2 rounded-md mt-4"
               >
                 + Agregar película
               </button>
             </div>
 
-            {/* formulario de peli */}
+            {/* formulario de pelicula */}
             <div className="w-2/3">
               <h3 className="text-lg font-bold mb-2">
-                {selectedMovie ? "Editar Película" : "Nueva Película"}
+                {formActive ? (selectedMovie ? "Editar Película" : "Nueva Película") : "Selecciona una película para editar"}
               </h3>
 
               <div className="grid grid-cols-2 gap-4">
@@ -398,7 +417,7 @@ export default function AdminPage() {
                     type="file"
                     onChange={handleImagePreview}
                     className="w-full border p-2 rounded"
-                    disabled={!isEditing}
+                    disabled={!formActive}
                   />
                 </div>
                 
@@ -409,7 +428,7 @@ export default function AdminPage() {
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder="Título"
                     className="w-full border p-2 rounded"
-                    disabled={!isEditing}
+                    disabled={!formActive}
                   />
                   <textarea
                     value={description}
@@ -417,7 +436,7 @@ export default function AdminPage() {
                     placeholder="Sinopsis"
                     className="w-full border p-2 rounded"
                     rows={4}
-                    disabled={!isEditing}
+                    disabled={!formActive}
                   />
                   <input
                     type="text"
@@ -425,11 +444,11 @@ export default function AdminPage() {
                     onChange={(e) => setDuration(e.target.value)}
                     placeholder="Duración (minutos)"
                     className="w-full border p-2 rounded"
-                    disabled={!isEditing}
+                    disabled={!formActive}
                   />
                 </div>
               </div>
-
+            {formActive && (
               <div className="flex gap-4 mt-6">
                 <button
                   onClick={handleSaveMovie}
@@ -453,6 +472,7 @@ export default function AdminPage() {
                   </button>
                 )}
               </div>
+            )}
             </div>
           </div>
         </div>
@@ -464,7 +484,7 @@ export default function AdminPage() {
               Programar Funciones para: <span className="text-purple-700">{selectedMovie.title}</span>
             </h2>
             
-            {/* campo de precio  */}
+            {/* campo de precio global */}
             <div className="mb-6 flex items-center gap-4">
               <label className="font-medium">Precio global para todas las funciones:</label>
               <input
@@ -476,7 +496,6 @@ export default function AdminPage() {
                 min="0"
                 step="0.01"
               />
-              
             </div>
             
             <div className="flex gap-4 overflow-x-auto pb-4">
@@ -513,20 +532,28 @@ export default function AdminPage() {
                       </button>
                     </div>
                     
-                    {/* funciones existente */}
+                    {/* funciones programadas con boton eliminar */}
                     <div className="mt-4">
                       <h4 className="font-medium mb-2">Funciones programadas:</h4>
                       {screenings
                         .filter(s => s.date === day.isoDate && s.movieId === selectedMovie.id)
                         .map(screening => (
-                          <div key={screening.id} className="bg-white p-2 rounded border mb-2">
-                            <div className="font-medium">
-                              {screening.time}
+                          <div key={screening.id} className="bg-white p-2 rounded border mb-2 flex justify-between items-center">
+                            <div>
+                              <div className="font-medium">
+                                {screening.time}
+                              </div>
+                              <div className="text-sm">
+                                Sala: {rooms.find(r => r.id === screening.roomId)?.name} | 
+                                Precio: {screening.price}€
+                              </div>
                             </div>
-                            <div className="text-sm">
-                              Sala: {rooms.find(r => r.id === screening.roomId)?.name} | 
-                              Precio: {screening.price}€
-                            </div>
+                            <button
+                              onClick={() => handleDeleteScreening(screening.id)}
+                              className="bg-red-500 text-white px-2 py-1 rounded text-sm hover:bg-red-600 transition-colors"
+                            >
+                              Eliminar
+                            </button>
                           </div>
                         ))}
                     </div>
@@ -541,4 +568,4 @@ export default function AdminPage() {
   );
 }
 
-export const AdminPageWithAuth = withAuth(AdminPage, { allowedRoles: ["admin"] });
+export default withAuth(AdminPage, { allowedRoles: ["admin"] });

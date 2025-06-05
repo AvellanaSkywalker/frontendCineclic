@@ -51,6 +51,7 @@ export default function BookingsPage() {
     if (savedName) setUserName(savedName);
 
     // carga historial de reservas buscadas
+    if(!savedToken) {
     const savedSearchedBookings = sessionStorage.getItem("searchedBookings");
     if (savedSearchedBookings) {
       try {
@@ -60,7 +61,7 @@ export default function BookingsPage() {
       } catch (e) {
         console.error("Error parsing searched bookings", e);
       }
-    }
+    }}
   }, []);
 
   // para mantener reservas buscadas
@@ -70,20 +71,20 @@ export default function BookingsPage() {
     }
   }, [bookings, isClient]);
 
-  // maneja cambio de usuario
-  useEffect(() => {
-    if (initialLoad.current) {
-      initialLoad.current = false;
-      return;
-    }
+  // // maneja cambio de usuario
+  // useEffect(() => {
+  //   if (initialLoad.current) {
+  //     initialLoad.current = false;
+  //     return;
+  //   }
     
-    if (token) {
-      // limpia reserevas
-      setBookings([]);
-      sessionStorage.removeItem("searchedBookings");
-      setHasSearched(false);
-    }
-  }, [token]);
+  //   if (token) {
+  //     // limpia reserevas
+  //     setBookings([]);
+  //     sessionStorage.removeItem("searchedBookings");
+  //     setHasSearched(false);
+  //   }
+  // }, [token]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -191,7 +192,7 @@ export default function BookingsPage() {
       if (!response.ok) {
         
         if (data.error === "La reserva ya está cancelada.") {
-          // Actualizar estado local
+          // Actualiza estado local
           setBookings(prev => 
             prev.map(booking =>
               booking.id === selectedBooking.id
