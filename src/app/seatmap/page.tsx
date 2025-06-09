@@ -98,7 +98,7 @@ export default function SeatMap() {
     }
   };
 
-  // Confirma selecc 
+  // confirma selecc 
   const handleConfirmSelection = async () => {
     const token = localStorage.getItem("token");
     const formattedSeats = selectedSeats.map((seat) => ({
@@ -169,16 +169,16 @@ return (
       </button>
     </div>
 
-    {/* Timer centrado */}
+    {/* timer centrado */}
     <div className="my-6 text-center text-3xl font-mono font-bold text-purple-700">
       {Math.floor(timer / 60)}:{(timer % 60).toString().padStart(2, "0")}
     </div>
 
-    {/* Contenedor principl */}
+    {/* contenedor principl */}
     <div className="max-w-7xl mx-auto px-8 bg-gradient-to-br from-purple-50 via-pink-50 to-gray-100 min-h-screen space-y-16">
       <div className="flex flex-col lg:flex-row gap-20">
         
-        {/* Mapa de Asientos */}
+        {/* mapa de Asientos */}
         <div className="flex-1 bg-white p-8 border rounded-4xl shadow ">
           {/* PANTALLA */}
           <div className="mb-12 text-center">
@@ -189,7 +189,7 @@ return (
 
           {!loading && layout && (
             <div className="flex flex-col ">
-              {/* grid de asientos con etiquetas a la derecha */}
+              {/* grid de asientos  */}
               {layout.rows.map((row) => (
                 <div key={row} className="flex items-center gap-6 mb-4">
                   <div className="grid grid-cols-11 gap-6">

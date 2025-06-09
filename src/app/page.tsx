@@ -81,14 +81,14 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen bg-white text-gray-900">
-      {/* Header  */}
+      {/* header  */}
       <header className="bg-purple-700 py-5 sticky top-0 z-10">
         <div className="max-w-5xl mx-auto">
           <h1 className="font-black text-3xl text-white pl-2">CineClic</h1>
         </div>
       </header>
 
-      {/* Botones */}
+      {/* botones */}
       <div className="w-full flex justify-between px-10 py-4 sticky top-16 bg-white z-10">
         <button
           onClick={() => router.push(`/bookings`)}
@@ -121,7 +121,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Contenedor principal para pel */}
+      {/* contenedor principal para peli */}
       <div className="flex-grow overflow-y-auto pb-20">
         <main className="max-w-5xl mx-auto p-5">
           <div className="flex flex-col gap-4 w-full pl-2"> {/*  */}

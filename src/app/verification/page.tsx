@@ -27,7 +27,7 @@ function AuthContent() {
       return;
     }
 
-    // validael token con el backend
+    // validael token 
     const validateToken = async () => {
       try {
         const res = await fetch(`http://localhost:4000/api/auth/confirm/${token}`);

@@ -60,7 +60,7 @@ export const withAuth = (
     }
 
     if (!isAuthorized) {
-      return null; // O un componente de No autorizado
+      return null; // componente de No autorizado
     }
 
     return <WrappedComponent {...props} />;

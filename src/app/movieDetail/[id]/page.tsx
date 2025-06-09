@@ -89,7 +89,7 @@ export default function MovieDetail() {
         // extrae ascreenings 
         setScreenings(movieData.movie.screenings || []);
 
-        // obtiene calificación del usuario
+        // obtiene calificacin del usuario
         const ratingRes = await fetch(`http://localhost:4000/api/movies/${id}/rating`, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -155,7 +155,7 @@ export default function MovieDetail() {
                 onMouseOver={() => handleMouseOver(star)}
                 onClick={() => handleClick(star)}
               >
-                {/* estrella vaci de fondo */}
+                {/* estrella vacia de fondo */}
                 <div className="absolute text-gray-300 text-3xl">★</div>
                 
                 {/* */}
@@ -201,7 +201,7 @@ export default function MovieDetail() {
     return days;
   };
 
-  // filtra screenings por dia usando el startTime
+  // filtra screenings por dia 
   const getScreeningsForDay = (isoDate: string) => {
     const filtered = screenings.filter(screening => {
       // rxtrae la parte de fecha de startTime
@@ -238,14 +238,14 @@ export default function MovieDetail() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-gray-100">
-      {/* Header */}
+      {/* header */}
       <header className="bg-purple-700 py-5">
         <div className="max-w-5xl mx-auto px-4">
           <h1 className="font-black text-3xl text-white">CineClic</h1>
         </div>
       </header>
 
-      {/* boton Inicio y menu  usuario  */}
+      {/* boton inicio y menu  usuario  */}
       <div className="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center gap-10">
         <button
           onClick={() => router.push("/")}
@@ -309,7 +309,7 @@ export default function MovieDetail() {
             </div>
           </div>
 
-          {/* Info de  peli */}
+          {/* info de  peli */}
           <div className="w-full md:w-2/3 lg:w-3/4">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
               {movie.title}

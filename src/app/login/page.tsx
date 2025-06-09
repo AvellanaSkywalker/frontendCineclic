@@ -77,7 +77,7 @@ export default function LoginPage() {
         console.log("dirige a admin");
         router.push("/admin"); // dirige al panel de administrador
       } else {
-        router.push("/"); // dirige al home
+        router.push("/"); // dirige a home
       }
 
       console.log("nombre guardado:", localStorage.getItem("userName"));
@@ -91,7 +91,7 @@ export default function LoginPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-white text-gray-900">
-      {/* Header */}
+      {/* header */}
       <header className="bg-purple-700 py-9"></header>
 
       {/* titulo */}

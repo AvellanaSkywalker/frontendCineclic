@@ -7,7 +7,7 @@ export default function SeatSelection() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // extrae los paramet dinamicos de la URL
+  // extrae los param dinamicos de la URL
   const screeningId = searchParams.get("screeningId");
   const roomId = searchParams.get("roomId");
   const movieName = searchParams.get("movieName");
@@ -30,7 +30,7 @@ export default function SeatSelection() {
 
   return (
     <div className="relative flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-gray-100 p-8">
-      {/* Boton de cierre */}
+      {/* boton de cierre */}
       <button
         className="absolute top-8 right-8 bg-pink-400 rounded-full w-12 h-12 flex items-center justify-center text-gray-900 hover:bg-violet-400 transition text-2xl shadow-md"
         onClick={() => router.back()}

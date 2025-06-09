@@ -230,7 +230,7 @@ function AdminPage() {
       // busca sala disponible o crea nueva
       let roomToUse: Room | null  = null;
       
-      // intenta reutilizar salas existentes
+      // reutiliza salas existentes
       const existingRoom = rooms.find(room => 
         room.name.startsWith("Sala ") && 
         !screenings.some(s => 
@@ -243,7 +243,7 @@ function AdminPage() {
       if (existingRoom) {
         roomToUse = existingRoom;
       } else {
-        // crea nueva sala con nombre secuencial
+        // crea nueva sala 
         const roomNumbers = rooms
           .filter(room => room.name.startsWith("Sala "))
           .map(room => {
@@ -313,7 +313,6 @@ function AdminPage() {
       if (screeningRes.ok) {
         toast.success("Función creada exitosamente");
         fetchData();
-        // limpia solo el tiempo 
         setScreeningTimes(prev => ({
           ...prev,
           [date]: ""

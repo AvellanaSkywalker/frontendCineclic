@@ -47,7 +47,7 @@ function ResetPasswordForm() {
       }
 
       toast.success("Contraseña actualizada correctamente!");
-      router.push("/confirmation"); // dirige a la pantalla de bienvenida
+      router.push("/confirmation"); 
 
     } catch (error: unknown) {
       toast.error(error instanceof Error ? error.message : "Error inesperado.");
@@ -56,10 +56,10 @@ function ResetPasswordForm() {
 
   return (
     <div className="flex flex-col min-h-screen bg-white text-gray-900">
-      {/* Header */}
+      {/* header */}
       <header className="bg-purple-700 py-9"></header>
 
-      {/* Tutlo  */}
+      {/* tutlo  */}
       <div className="max-w-5xl mx-auto flex justify-start pl-2 mt-6">
         <h1 className="font-black text-3xl text-black">CineClic</h1>
       </div>

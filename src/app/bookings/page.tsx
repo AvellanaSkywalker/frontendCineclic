@@ -125,7 +125,7 @@ export default function BookingsPage() {
 
         // cctualiza estado de reservas
         setBookings(prev => {
-          // rea mapa para evitar duplicados 
+          // crea mapa para evitar duplicados 
           const bookingMap = new Map<number, Booking>();
           
           // reservas existentes
@@ -144,7 +144,7 @@ export default function BookingsPage() {
         console.error("Error fetching bookings:", error);
       } finally {
         setLoading(false);
-        setSearchFolio(""); // limpia campo 
+        setSearchFolio("");  
       }
     },
     [token]

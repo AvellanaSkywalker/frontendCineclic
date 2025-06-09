@@ -78,7 +78,7 @@ export default function RegisterPage() {
 
 return (
   <div className="flex flex-col min-h-screen bg-white text-gray-900">
-    {/* Header */}
+    {/* header */}
     <header className="bg-purple-700 py-9"></header>
 
     {/* titulo */}
