@@ -19,21 +19,25 @@ type Room = {
   id: string;
   name: string;
   capacity: number;
+  layout: {
+    rows: string[];
+    columns: number[];
+    seats: Record<string, Record<string, string>>;
+  };
 };
 
 type Screening = {
   id: string;
   movieId: string;
   roomId: string;
-  startTime: string;  // Cambiado a string ISO
-  endTime: string;    // Cambiado a string ISO
+  startTime: string;
+  endTime: string;
   price: number;
 };
 
 type WeekDate = { dateObj: Date; formattedDate: string; isoDate: string };
 
-// genera layout predeterminado
-const generateDefaultLayout = () => {
+const generateDefaultLayout = (roomId: string) => {
   const rows = ["A", "B", "C", "D", "E", "F", "G"];
   const columns = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
   
@@ -41,7 +45,10 @@ const generateDefaultLayout = () => {
   rows.forEach(row => {
     seats[row] = {};
     columns.forEach(column => {
-      seats[row][column] = "available";
+      const stateSeed = `${roomId}-${row}-${column}`;
+      const stateHash = Array.from(stateSeed).reduce((acc, char) => 
+        acc + char.charCodeAt(0), 0) % 100;
+      seats[row][column] = stateHash < 10 ? "occupied" : "available";
     });
   });
 
@@ -70,11 +77,10 @@ function AdminPage() {
   const [formActive, setFormActive] = useState(false);
   const [loadingScreenings, setLoadingScreenings] = useState(true);
 
-  // genera fechas para los prox 7 dias
   const getWeekDates = () => {
     const days = [];
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Normalizar a medianoche
+    today.setHours(0, 0, 0, 0);
     const options: Intl.DateTimeFormatOptions = { weekday: 'long', day: 'numeric', month: 'short' };
 
     for (let i = 0; i < 7; i++) {
@@ -92,9 +98,8 @@ function AdminPage() {
   const weekDates: WeekDate[] = getWeekDates();
 
   useEffect(() => {
-    fetchData(); 
+    fetchData();
     
-    // Inicializar screeningTimes con fechas vacías
     const initialTimes: Record<string, string> = {};
     weekDates.forEach(day => {
       initialTimes[day.isoDate] = "";
@@ -104,14 +109,12 @@ function AdminPage() {
 
   const fetchData = async () => {
     try {
-      // obtiene peliculas
       const moviesRes = await fetch("http://localhost:4000/api/movies", {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       const moviesData = await moviesRes.json();
       setMovies(moviesData.movies || []);
 
-      // obtiene salas
       const roomsRes = await fetch("http://localhost:4000/api/rooms", {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
@@ -122,7 +125,6 @@ function AdminPage() {
       toast.error("Error al cargar datos");
     }
 
-    // Obtiene funciones con manejo de error específico
     try {
       setLoadingScreenings(true);
       const screeningsRes = await fetch("http://localhost:4000/api/screening", {
@@ -187,7 +189,6 @@ function AdminPage() {
       const data = await res.json();
       toast.success(selectedMovie ? 'Película actualizada' : 'Película creada');
       
-      
       if (!selectedMovie) {
         setSelectedMovie(data.movie);
       }
@@ -249,85 +250,54 @@ function AdminPage() {
         return;
       }
 
-      // Combina fecha y hora en formato ISO
       const startTimeISO = `${date}T${time}:00`;
-      
-      // busca sala disponible o crea nueva
-      let roomToUse: Room | null  = null;
-      
-      // reutiliza salas existentes
-      const existingRoom = rooms.find(room => 
-        room.name.startsWith("Sala ") && 
-        !screenings.some(s => {
-          // Convertir fechas para comparación
-          const sStart = new Date(s.startTime);
-          const sEnd = new Date(s.endTime);
-          const newStart = new Date(startTimeISO);
-          const newEnd = new Date(newStart.getTime() + Number(selectedMovie.duration) * 60000);
-          
-          // Verificar si hay solapamiento
-          return (
-            s.roomId === room.id && 
-            (
-              (newStart >= sStart && newStart < sEnd) ||
-              (newEnd > sStart && newEnd <= sEnd) ||
-              (newStart <= sStart && newEnd >= sEnd)
-            )
-          );
-        })
-      );
-      
-      if (existingRoom) {
-        roomToUse = existingRoom;
-      } else {
-        // crea nueva sala 
-        const roomNumbers = rooms
-          .filter(room => room.name.startsWith("Sala "))
-          .map(room => {
-            const match = room.name.match(/Sala (\d+)/);
-            return match ? parseInt(match[1]) : 0;
-          });
-        
-        const maxRoomNumber = Math.max(0, ...roomNumbers);
-        const newRoomNumber = maxRoomNumber + 1;
-        const roomName = `Sala ${newRoomNumber}`;
-        
-        const roomRes = await fetch("http://localhost:4000/api/rooms", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-          body: JSON.stringify({ 
-            name: roomName,
-            capacity: 91,
-            layout: generateDefaultLayout()
-          }),
-        });
-
-        if (!roomRes.ok) {
-          const errorData = await roomRes.json();
-          toast.error(errorData.error || "Error al crear sala");
-          return;
-        }
-
-        const roomData = await roomRes.json();
-        roomToUse = roomData.room;
-        
-        if (roomToUse) {
-          setRooms(prev => [...prev, roomToUse!]);
-        } else {
-          toast.error("Error al obtener datos de la nueva sala");
-          return;
-        }
-      }
-
-      // Calcula endTime basado en la duración de la película
-      const startDateTime = new Date(startTimeISO);
       const movieDuration = Number(selectedMovie.duration) || 120;
-      const endDateTime = new Date(startDateTime.getTime() + movieDuration * 60000);
+      const endDateTime = new Date(new Date(startTimeISO).getTime() + movieDuration * 60000);
       const endTimeISO = endDateTime.toISOString();
 
+      // 1. Crear nueva sala con layout único
+      const roomNumbers = rooms
+        .filter(room => room.name.startsWith("Sala "))
+        .map(room => {
+          const match = room.name.match(/Sala (\d+)/);
+          return match ? parseInt(match[1]) : 0;
+        });
+      
+      const maxRoomNumber = Math.max(0, ...roomNumbers);
+      const newRoomNumber = maxRoomNumber + 1;
+      const roomName = `Sala ${newRoomNumber}`;
+      
+      const uniqueRoomId = `room-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      const newLayout = generateDefaultLayout(uniqueRoomId);
+      
+      const roomRes = await fetch("http://localhost:4000/api/rooms", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({ 
+          name: roomName,
+          capacity: 91,
+          layout: newLayout
+        }),
+      });
+
+      if (!roomRes.ok) {
+        const errorData = await roomRes.json();
+        toast.error(errorData.error || "Error al crear sala");
+        return;
+      }
+
+      const roomData = await roomRes.json();
+      const roomToUse = roomData.room;
+      
+      if (!roomToUse) {
+        toast.error("Error al obtener datos de la nueva sala");
+        return;
+      }
+
+      // 2. Crear la función con la nueva sala
       const screeningRes = await fetch("http://localhost:4000/api/screening", {
         method: "POST",
         headers: {
@@ -345,11 +315,10 @@ function AdminPage() {
 
       if (screeningRes.ok) {
         toast.success("Función creada exitosamente");
-        fetchData();
-        setScreeningTimes(prev => ({
-          ...prev,
-          [date]: ""
-        }));
+        const newScreening = await screeningRes.json();
+        setScreenings(prev => [...prev, newScreening.screening]);
+        setRooms(prev => [...prev, roomToUse]);
+        setScreeningTimes(prev => ({ ...prev, [date]: "" }));
       } else {
         const error = await screeningRes.json();
         toast.error(error.error || "Error al crear función");
@@ -359,7 +328,6 @@ function AdminPage() {
     }
   };
 
-  // elimina una función programada
   const handleDeleteScreening = async (screeningId: string) => {
     try {
       const res = await fetch(`http://localhost:4000/api/screening/${screeningId}`, {
@@ -369,7 +337,6 @@ function AdminPage() {
 
       if (res.ok) {
         toast.success("Función eliminada");
-        // Actualiza el estado de screenings 
         setScreenings(prev => prev.filter(s => s.id !== screeningId));
       } else {
         const error = await res.json();
@@ -546,7 +513,6 @@ function AdminPage() {
             <div className="flex gap-4 overflow-x-auto pb-4">
               {weekDates.map((day) => {
                 const dayTime = screeningTimes[day.isoDate] || "";
-                // Filtrar funciones por fecha usando startTime
                 const dayScreenings = screenings.filter(s => {
                   const screeningDate = new Date(s.startTime).toISOString().split('T')[0];
                   return screeningDate === day.isoDate && s.movieId === selectedMovie.id;
@@ -583,7 +549,6 @@ function AdminPage() {
                       </button>
                     </div>
                     
-                    {/* funciones programadas con boton eliminar */}
                     <div className="mt-4">
                       <h4 className="font-medium mb-2">Funciones programadas:</h4>
                       
@@ -594,7 +559,6 @@ function AdminPage() {
                       ) : (
                         dayScreenings.map(screening => {
                           const room = rooms.find(r => r.id === screening.roomId);
-                          // Extraer solo la hora de startTime
                           const startTime = new Date(screening.startTime).toTimeString().slice(0,5);
                           return (
                             <div 

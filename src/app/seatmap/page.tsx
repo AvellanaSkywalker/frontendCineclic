@@ -212,7 +212,9 @@ export default function SeatMap() {
   if (loading) return <p>Cargando...</p>
   if (error)   return <p className="text-red-500">{error}</p>
 
-  return (
+// ... (código anterior sin cambios) ...
+
+return (
     <div className="bg-gradient-to-br from-purple-50 via-pink-50 to-gray-100 min-h-screen">
       {/* Header */}
       <header className="bg-purple-700 py-4 shadow-lg">
@@ -275,9 +277,9 @@ export default function SeatMap() {
               <div className="flex flex-col">
                 {/* Grid de asientos */}
                 {layout.rows.map((row) => (
-                  <div key={row} className="flex items-center gap-4 mb-4">
-                    <div className="text-sm font-bold text-gray-700 w-6 text-center">{row}</div>
-                    <div className="grid grid-cols-11 gap-2">
+                  <div key={row} className="flex items-center mb-6">
+                    {/* Asientos */}
+                    <div className="grid grid-cols-11 gap-4 flex-grow">
                       {layout.columns.map((col) => {
                         const seatId = `${row}${col}`;
                         const status = getSeatStatus(row, col);
@@ -285,26 +287,43 @@ export default function SeatMap() {
                         return (
                           <button
                             key={seatId}
-                            className={getSeatClasses(status)}
+                            className={`w-14 h-14 rounded-lg transition-all duration-200 flex items-center justify-center ${
+                              status === "available" 
+                                ? "bg-white border-2 border-gray-300 hover:bg-gray-100" 
+                                : status === "selected" 
+                                  ? "bg-blue-500 border-2 border-blue-700 transform scale-105" 
+                                  : status === "occupied" 
+                                    ? "bg-red-500 border-2 border-red-700 cursor-not-allowed" 
+                                    : "bg-gray-400 border-2 border-gray-600 cursor-not-allowed"
+                            }`}
                             onClick={() => handleSelectSeat(row, col)}
                             disabled={status === "occupied" || status === "reserved"}
                             title={`Asiento ${row}${col}`}
                           >
-                            {col}
+                            {status === "selected" && (
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                              </svg>
+                            )}
                           </button>
                         );
                       })}
                     </div>
+                    
+                    {/* Etiqueta de fila a la derecha */}
+                    <div className="text-lg font-bold text-gray-700 w-10 text-center ml-4">{row}</div>
                   </div>
                 ))}
-                
-                {/* Etiquetas de columnas */}
-                <div className="flex justify-center gap-2 mt-4 pl-6">
-                  {layout.columns.map((col) => (
-                    <div key={col} className="w-10 text-center text-xs font-bold text-gray-600">
-                      {col}
-                    </div>
-                  ))}
+
+                {/* Etiquetas de columnas en la parte inferior */}
+                <div className="flex justify-center mt-4">
+                  <div className="grid grid-cols-11 gap-4">
+                    {layout.columns.map(col => (
+                      <div key={`col-bottom-${col}`} className="w-14 text-center text-sm font-bold text-gray-600">
+                        {col}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             )}
@@ -312,10 +331,10 @@ export default function SeatMap() {
             {/* Leyenda de estados */}
             <div className="mt-12 grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 bg-gray-50 rounded-lg">
               {[
-                { color: "bg-red-500", label: "Ocupado" },
-                { color: "bg-white border border-gray-300", label: "Disponible" },
-                { color: "bg-blue-500", label: "Seleccionado" },
-                { color: "bg-gray-400", label: "Reservado" }
+                { color: "bg-white border-2 border-gray-300", label: "Disponible" },
+                { color: "bg-red-500 border-2 border-red-700", label: "Ocupado" },
+                { color: "bg-blue-500 border-2 border-blue-700", label: "Seleccionado" },
+                { color: "bg-gray-400 border-2 border-gray-600", label: "Reservado" }
               ].map((item, index) => (
                 <div key={index} className="flex items-center justify-center gap-2">
                   <div className={`w-5 h-5 rounded ${item.color}`}></div>
@@ -408,5 +427,6 @@ export default function SeatMap() {
       </div>
     </div>
   );
+
 }
 
