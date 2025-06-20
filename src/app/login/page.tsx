@@ -108,6 +108,7 @@ export default function LoginPage() {
         <div className="p-8 rounded-lg w-full max-w-md text-left">
           <form className="space-y-6" onSubmit={handleLogin}>
             <div className="flex flex-col gap-1">
+              
               <label className="font-bold text-md text-gray-800">
                 Correo Electrónico
               </label>
@@ -143,7 +144,6 @@ export default function LoginPage() {
                 <p className="text-red-500 text-xs italic">{passwordError}</p>
               )}
             </div>
-
             <button
               type="submit"
               className="bg-purple-700 hover:bg-purple-600 w-full p-2 rounded-xl text-white font-bold text-lg"
@@ -151,6 +151,30 @@ export default function LoginPage() {
               Iniciar Sesión
             </button>
           </form>
+
+          {/* Boton Entrar como invitado */}
+          <button
+            type="button"
+            className="mt-4 bg-pink-600 hover:bg-pink-500 w-full p-2 rounded-xl text-white font-bold text-lg"
+            onClick={async () => {
+              try {
+                const res = await fetch('http://localhost:4000/api/auth/guest', {
+                  method: 'POST'
+                });
+                const data = await res.json();
+                if (data.token) {
+                  localStorage.setItem("token", data.token);
+                  localStorage.setItem("userName", data.user.name);
+                  localStorage.setItem("userRole", data.user.role);
+                  router.push("/");
+                }
+              } catch (error) {
+                // Manejo de error opcional
+              }
+            }}
+          >
+            Entrar como invitado
+          </button>
 
           {/* hipervnculos */}
           <nav className="mt-6 flex flex-col space-y-5 text-sm text-center">

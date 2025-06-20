@@ -66,6 +66,7 @@ export default function RegisterPage() {
       }
 
       toast.success("Cuenta creada correctamente!");
+      alert("Se completo el registro revisa tu correo");
       router.push("/login");
     } catch (error: unknown) {
       if (error instanceof Error) {

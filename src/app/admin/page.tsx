@@ -25,8 +25,8 @@ type Screening = {
   id: string;
   movieId: string;
   roomId: string;
-  date: string;
-  time: string;
+  startTime: string;  // Cambiado a string ISO
+  endTime: string;    // Cambiado a string ISO
   price: number;
 };
 
@@ -68,11 +68,13 @@ function AdminPage() {
   const [globalPrice, setGlobalPrice] = useState("");
   const [screeningTimes, setScreeningTimes] = useState<Record<string, string>>({});
   const [formActive, setFormActive] = useState(false);
+  const [loadingScreenings, setLoadingScreenings] = useState(true);
 
   // genera fechas para los prox 7 dias
   const getWeekDates = () => {
     const days = [];
     const today = new Date();
+    today.setHours(0, 0, 0, 0); // Normalizar a medianoche
     const options: Intl.DateTimeFormatOptions = { weekday: 'long', day: 'numeric', month: 'short' };
 
     for (let i = 0; i < 7; i++) {
@@ -91,6 +93,13 @@ function AdminPage() {
 
   useEffect(() => {
     fetchData(); 
+    
+    // Inicializar screeningTimes con fechas vacías
+    const initialTimes: Record<string, string> = {};
+    weekDates.forEach(day => {
+      initialTimes[day.isoDate] = "";
+    });
+    setScreeningTimes(initialTimes);
   }, []);
 
   const fetchData = async () => {
@@ -109,15 +118,28 @@ function AdminPage() {
       const roomsData = await roomsRes.json();
       setRooms(roomsData.rooms || []);
 
-      // Obtiene funciones
+    } catch {
+      toast.error("Error al cargar datos");
+    }
+
+    // Obtiene funciones con manejo de error específico
+    try {
+      setLoadingScreenings(true);
       const screeningsRes = await fetch("http://localhost:4000/api/screening", {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
+      
+      if (!screeningsRes.ok) {
+        throw new Error(`Error ${screeningsRes.status}: ${screeningsRes.statusText}`);
+      }
+      
       const screeningsData = await screeningsRes.json();
       setScreenings(screeningsData.screenings || []);
-
-    } catch {
-      toast.error("Error al cargar datos");
+    } catch (error) {
+      console.error("Error al cargar funciones:", error);
+      toast.error("Error al cargar funciones. Por favor, intente más tarde.");
+    } finally {
+      setLoadingScreenings(false);
     }
   };
 
@@ -227,17 +249,32 @@ function AdminPage() {
         return;
       }
 
+      // Combina fecha y hora en formato ISO
+      const startTimeISO = `${date}T${time}:00`;
+      
       // busca sala disponible o crea nueva
       let roomToUse: Room | null  = null;
       
       // reutiliza salas existentes
       const existingRoom = rooms.find(room => 
         room.name.startsWith("Sala ") && 
-        !screenings.some(s => 
-          s.roomId === room.id && 
-          s.date === date && 
-          s.time === time
-        )
+        !screenings.some(s => {
+          // Convertir fechas para comparación
+          const sStart = new Date(s.startTime);
+          const sEnd = new Date(s.endTime);
+          const newStart = new Date(startTimeISO);
+          const newEnd = new Date(newStart.getTime() + Number(selectedMovie.duration) * 60000);
+          
+          // Verificar si hay solapamiento
+          return (
+            s.roomId === room.id && 
+            (
+              (newStart >= sStart && newStart < sEnd) ||
+              (newEnd > sStart && newEnd <= sEnd) ||
+              (newStart <= sStart && newEnd >= sEnd)
+            )
+          );
+        })
       );
       
       if (existingRoom) {
@@ -285,14 +322,11 @@ function AdminPage() {
         }
       }
 
-      // crea funcion con sala seleccionada
-      const [hours, minutes] = time.split(":").map(Number);
-      const startDateTime = new Date();
-      startDateTime.setHours(hours, minutes, 0, 0);
-
+      // Calcula endTime basado en la duración de la película
+      const startDateTime = new Date(startTimeISO);
       const movieDuration = Number(selectedMovie.duration) || 120;
       const endDateTime = new Date(startDateTime.getTime() + movieDuration * 60000);
-      const endTime = endDateTime.toTimeString().slice(0, 5);
+      const endTimeISO = endDateTime.toISOString();
 
       const screeningRes = await fetch("http://localhost:4000/api/screening", {
         method: "POST",
@@ -303,9 +337,8 @@ function AdminPage() {
         body: JSON.stringify({
           movieId: selectedMovie.id,
           roomId: roomToUse.id,
-          date,
-          startTime: time,
-          endTime: endTime,
+          startTime: startTimeISO,
+          endTime: endTimeISO,
           price: Number(globalPrice),
         }),
       });
@@ -317,13 +350,16 @@ function AdminPage() {
           ...prev,
           [date]: ""
         }));
+      } else {
+        const error = await screeningRes.json();
+        toast.error(error.error || "Error al crear función");
       }
     } catch (error) {
       toast.error("Error al crear función: " + (error instanceof Error ? error.message : String(error)));
     }
   };
 
-  //  elimina una funcn programada
+  // elimina una función programada
   const handleDeleteScreening = async (screeningId: string) => {
     try {
       const res = await fetch(`http://localhost:4000/api/screening/${screeningId}`, {
@@ -333,7 +369,7 @@ function AdminPage() {
 
       if (res.ok) {
         toast.success("Función eliminada");
-        // actualiza el estado de screenings 
+        // Actualiza el estado de screenings 
         setScreenings(prev => prev.filter(s => s.id !== screeningId));
       } else {
         const error = await res.json();
@@ -349,12 +385,18 @@ function AdminPage() {
       <header className="bg-purple-700 py-4 flex justify-between items-center px-6">
         <h1 className="text-2xl font-bold text-white">CineClic Admin</h1>
         <div className="relative">
-          <button onClick={() => setMenuOpen(!menuOpen)} className="bg-pink-500 text-white px-4 py-2 rounded-full hover:bg-violet-400 transition-colors">
+          <button 
+            onClick={() => setMenuOpen(!menuOpen)} 
+            className="bg-pink-500 text-white px-4 py-2 rounded-full hover:bg-violet-400 transition-colors"
+          >
             Administrador
           </button>
           {menuOpen && (
             <div className="absolute right-0 mt-2 bg-white text-black rounded-lg shadow-lg w-48">
-              <button onClick={() => router.push("/login")} className="block w-full text-left px-4 py-2 hover:bg-gray-200">
+              <button 
+                onClick={() => router.push("/login")} 
+                className="block w-full text-left px-4 py-2 hover:bg-gray-200"
+              >
                 Cerrar sesión
               </button>
             </div>
@@ -379,7 +421,9 @@ function AdminPage() {
                       key={movie.id}
                       onClick={() => handleSelectMovie(movie)}
                       className={`w-full text-left p-2 rounded ${
-                        selectedMovie?.id === movie.id ? "bg-purple-200" : "bg-gray-100 hover:bg-gray-200"
+                        selectedMovie?.id === movie.id 
+                          ? "bg-purple-200 font-medium" 
+                          : "bg-gray-100 hover:bg-gray-200"
                       }`}
                     >
                       {movie.title}
@@ -389,7 +433,7 @@ function AdminPage() {
               </div>
               <button 
                 onClick={() => { resetForm(); setIsEditing(true); setFormActive(true); }}
-                className="bg-green-500 text-white px-3 py-2 rounded-md mt-4"
+                className="bg-green-500 text-white px-3 py-2 rounded-md mt-4 w-full"
               >
                 + Agregar película
               </button>
@@ -398,7 +442,9 @@ function AdminPage() {
             {/* formulario de pelicula */}
             <div className="w-2/3">
               <h3 className="text-lg font-bold mb-2">
-                {formActive ? (selectedMovie ? "Editar Película" : "Nueva Película") : "Selecciona una película para editar"}
+                {formActive 
+                  ? (selectedMovie ? "Editar Película" : "Nueva Película") 
+                  : "Selecciona una película para editar"}
               </h3>
 
               <div className="grid grid-cols-2 gap-4">
@@ -409,7 +455,7 @@ function AdminPage() {
                       alt="Preview" 
                       width={200} 
                       height={300} 
-                      className="rounded-md mb-4 object-cover w-full h-64"
+                      className="rounded-md mb-4 object-cover w-full h-64 border"
                     />
                   )}
                   <input
@@ -500,6 +546,12 @@ function AdminPage() {
             <div className="flex gap-4 overflow-x-auto pb-4">
               {weekDates.map((day) => {
                 const dayTime = screeningTimes[day.isoDate] || "";
+                // Filtrar funciones por fecha usando startTime
+                const dayScreenings = screenings.filter(s => {
+                  const screeningDate = new Date(s.startTime).toISOString().split('T')[0];
+                  return screeningDate === day.isoDate && s.movieId === selectedMovie.id;
+                });
+
                 return (
                   <div key={day.isoDate} className="min-w-[220px] border rounded-lg p-4 bg-gray-50">
                     <h3 className="font-bold text-lg mb-3 text-center">
@@ -534,27 +586,40 @@ function AdminPage() {
                     {/* funciones programadas con boton eliminar */}
                     <div className="mt-4">
                       <h4 className="font-medium mb-2">Funciones programadas:</h4>
-                      {screenings
-                        .filter(s => s.date === day.isoDate && s.movieId === selectedMovie.id)
-                        .map(screening => (
-                          <div key={screening.id} className="bg-white p-2 rounded border mb-2 flex justify-between items-center">
-                            <div>
-                              <div className="font-medium">
-                                {screening.time}
-                              </div>
-                              <div className="text-sm">
-                                Sala: {rooms.find(r => r.id === screening.roomId)?.name} | 
-                                Precio: {screening.price}€
-                              </div>
-                            </div>
-                            <button
-                              onClick={() => handleDeleteScreening(screening.id)}
-                              className="bg-red-500 text-white px-2 py-1 rounded text-sm hover:bg-red-600 transition-colors"
+                      
+                      {loadingScreenings ? (
+                        <p className="text-gray-500 text-sm italic">Cargando funciones...</p>
+                      ) : dayScreenings.length === 0 ? (
+                        <p className="text-gray-500 text-sm italic">No hay funciones programadas</p>
+                      ) : (
+                        dayScreenings.map(screening => {
+                          const room = rooms.find(r => r.id === screening.roomId);
+                          // Extraer solo la hora de startTime
+                          const startTime = new Date(screening.startTime).toTimeString().slice(0,5);
+                          return (
+                            <div 
+                              key={screening.id} 
+                              className="bg-white p-2 rounded border mb-2 flex justify-between items-center"
                             >
-                              Eliminar
-                            </button>
-                          </div>
-                        ))}
+                              <div>
+                                <div className="font-medium">
+                                  {startTime}
+                                </div>
+                                <div className="text-sm text-gray-600">
+                                  Sala: {room?.name || 'No encontrada'} | 
+                                  Precio: {screening.price}€
+                                </div>
+                              </div>
+                              <button
+                                onClick={() => handleDeleteScreening(screening.id)}
+                                className="bg-red-500 text-white px-2 py-1 rounded text-sm hover:bg-red-600 transition-colors"
+                              >
+                                Eliminar
+                              </button>
+                            </div>
+                          );
+                        })
+                      )}
                     </div>
                   </div>
                 );

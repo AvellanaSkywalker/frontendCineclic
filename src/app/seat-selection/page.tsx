@@ -13,6 +13,9 @@ export default function SeatSelection() {
   const movieName = searchParams.get("movieName");
   const imageUrl = searchParams.get("imageUrl");
   const schedule = searchParams.get("schedule");
+  const savedToken = localStorage.getItem("token");
+  const savedName = localStorage.getItem("userName");
+  const savedRole = localStorage.getItem("userRole");
   const price = searchParams.get("price")
 
   const [selectedTickets, setSelectedTickets] = useState(1);
@@ -23,10 +26,20 @@ export default function SeatSelection() {
       alert("Información incompleta: falta el screening o la sala.");
       return;
     }
+
     // redirige a la pantalla del seatmap con los param din
     router.push(`/seatmap?screeningId=${screeningId}&roomId=${roomId}&movieName=${encodeURIComponent(movieName!)}&schedule=${schedule}&imageUrl=${encodeURIComponent(imageUrl)}&price=${price}&tickets=${selectedTickets}`);
 
   };
+  
+  if (savedRole === "guest") {
+    localStorage.removeItem("token");
+    localStorage.removeItem("userName");
+    localStorage.removeItem("userRole");
+    alert("Debes iniciar sesión para continuar");
+    router.push("/login");
+      return;
+    }
 
   return (
     <div className="relative flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-gray-100 p-8">
